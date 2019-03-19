@@ -33,7 +33,7 @@ pipeline {
             agent any
 
             steps {
-              sh 'docker run -d --network=host --rm --name build -v /var/jenkins_home:/var/jenkins_home maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
+              sh 'docker run --rm --network=host --name build -v /var/jenkins_home:/var/jenkins_home maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
               sh 'docker run --rm -d -p 8080:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
               sh 'apt-get install -y curl'
