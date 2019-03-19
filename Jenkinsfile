@@ -4,7 +4,7 @@ pipeline {
     environment {
 	    region = "us-west-2"
       git_repository = "https://github.com/rauccapuclla/devops-docker.git"
-      docker_registry =
+      docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
     }
     stages {
         stage('build') {
@@ -12,8 +12,8 @@ pipeline {
                docker { image 'maven:3-alpine' }
             }
             steps {
-            git url: ${git_repository}, branch: 'develop'
-            sh "mvn -DSkipTest clean install"
+              git url: ${git_repository}, branch: 'develop'
+              sh "mvn clean install -Dmaven.test.skip=true"
             }
         }
         stage('Test') {
