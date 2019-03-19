@@ -3,7 +3,7 @@
 respuesta=$(curl -s http://localhost:8080)
 
 if [ ! -z "$respuesta" ]; then
-  if [ "$respuesta" == "Aplicación de laboratorio v2" ]; then
+  if [ "$respuesta" == "Aplicación de laboratorio v1" ]; then
     echo "STATUS: Success"
     echo "Value : $respuesta"
   else

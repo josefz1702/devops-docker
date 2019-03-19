@@ -5,6 +5,7 @@ services:
     volumes:
       - .:/usr/src/app
       - mavenrepo:/root/.m2
+    network_mode: bridge
 volumes:
   mavenrepo:
-    external: true 
+    external: true
