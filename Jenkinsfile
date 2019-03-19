@@ -12,7 +12,7 @@ pipeline {
                docker { image 'maven:3-alpine' }
             }
             steps {
-              git url: ${git_repository}, branch: 'develop'
+              git url: "${git_repository}", branch: 'develop'
               sh "mvn clean install -Dmaven.test.skip=true"
             }
         }
