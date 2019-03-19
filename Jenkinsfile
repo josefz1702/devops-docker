@@ -1,5 +1,6 @@
 pipeline {
-    agent any
+    agent none
+
     environment {
 	    region = "us-west-2"
       git_repository = "https://github.com/rauccapuclla/devops-docker.git"
@@ -7,23 +8,39 @@ pipeline {
     }
     stages {
         stage('build') {
+            agent {
+               docker { image 'maven:3-alpine' }
+            }
             steps {
             git url: ${git_repository}, branch: 'develop'
-            sh "docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean install"
+            sh "mvn -DSkipTest clean install"
             }
         }
         stage('Test') {
-            steps {
-            sh "docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean test"
+            agent {
+               docker { image 'maven:3-alpine' }
             }
+            steps {
+            sh 'mvn clean install'
+            }
+            post {
+            success {
+              junit 'target/surefire-reports/**/*.xml'
+              }
+           }
         }
         stage('Integration Test') {
+            agent {
+               docker { image 'maven:3-alpine' }
+            }
             steps {
-            //Install npm
-
+              sh 'npm --version'
             }
         }
         stage('Docker push') {
+            agent {
+               docker { image 'docker' }
+            }
             steps {
             sh "docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package"
             sh "docker build -t ${docker_registry}:${BUILD_NUMBER} ."
