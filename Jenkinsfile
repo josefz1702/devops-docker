@@ -32,7 +32,7 @@ pipeline {
         stage('Integration Test') {
             agent any
             steps {
-              sh 'docker run --rm --name build -v "$(pwd)":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 ls -la'
+              sh 'docker run --rm --name build -v "$(pwd)/":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 ls -la'
             }
             post {
                 success {
