@@ -32,11 +32,7 @@ pipeline {
         stage('Integration Test') {
             agent any
             steps {
-              sh 'ls -la'
-              sh 'docker run --rm --name build -v "$(pwd)":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 mvn clean package'
-              sh 'docker build -t devops-docker .'
-              sh 'docker run --rm -d -p 8080:8080 --name app devops-docker'
-              sh './test/integration_test.sh'
+              sh 'docker run --rm --name build -v "$(pwd)":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 ls -la'
             }
             post {
                 success {
@@ -54,7 +50,7 @@ pipeline {
         stage('Docker push') {
             agent any
             steps {
-              sh 'docker run --rm --name build -v "$(pwd)":/usr/src/app/ -w /usr/src/app maven:3.3-jdk-8 mvn clean package'
+              sh 'docker run --rm --name build -v "$(pwd)":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t ${docker_registry}:${BUILD_NUMBER} .'
               sh 'aws ecr get-login --no-include-email'
               sh 'docker push "${docker_registry}:${BUILD_NUMBER}"'
