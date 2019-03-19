@@ -21,7 +21,7 @@ pipeline {
                docker { image 'maven:3-alpine' }
             }
             steps {
-            sh 'mvn clean install'
+            sh 'mvn clean test'
             }
             post {
             success {
@@ -32,7 +32,20 @@ pipeline {
         stage('Integration Test') {
             agent any
             steps {
-              sh 'docker run --rm -t postman/newman_ubuntu1404 --url="https://www.getpostman.com/collections/8a0c9bc08f062d12dcda"'
+              sh 'docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package'
+              sh 'docker build -t devops-docker .'
+              sh 'docker run --rm -d -p 8080:8080 --name app devops-docker'
+              sh './test/integration_test.sh'
+            }
+            post {
+                success {
+                    echo 'Integration test run successfully'
+                }
+                failure {
+                    sh 'docker stop app'
+                    sh 'docker rm app'
+                    sh 'docker rmi -devops-docker'
+                }
             }
         }
         stage('Docker push') {
