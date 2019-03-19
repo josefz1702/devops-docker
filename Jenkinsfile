@@ -30,17 +30,13 @@ pipeline {
            }
         }
         stage('Integration Test') {
-            agent {
-               docker { image 'maven:3-alpine' }
-            }
+            agent any
             steps {
-              sh 'npm --version'
+              sh 'docker run --rm -t postman/newman_ubuntu1404 --url="https://www.getpostman.com/collections/8a0c9bc08f062d12dcda"'
             }
         }
         stage('Docker push') {
-            agent {
-               docker { image 'docker' }
-            }
+            agent any
             steps {
               sh 'docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t ${docker_registry}:${BUILD_NUMBER} .'
