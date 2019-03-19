@@ -31,22 +31,32 @@ pipeline {
         }
         stage('Integration Test') {
             agent any
+
             steps {
-              sh 'docker run --rm --name build -v "$(pwd)/":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 ls -la'
+              sh 'docker run -d --network=host --rm --name build -v /var/jenkins_home:/var/jenkins_home mvn clean package -Dmaven.test.skip=true'
+              sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
+              sh 'docker run --rm -d -p 8080:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
+              sh 'apt-get install -y curl'
+              sh 'apt-get install -y aws-cli'
+              sh './test/integration_test.sh'
             }
+
             post {
                 success {
-                    sh 'docker rm build'
-                    echo 'Integration test run successfully'
+                  echo 'Integration test run successfully !!!'
+                  sh 'docker stop app'
+                  sh 'docker rm app'
+                  sh 'docker rmi "${docker_registry}:${BUILD_NUMBER}"'
                 }
                 failure {
                     sh 'docker stop app'
                     sh 'docker rm build'
                     sh 'docker rm app'
-                    sh 'docker rmi -devops-docker'
+                    sh 'docker "${docker_registry}:${BUILD_NUMBER}"'
                 }
             }
         }
+
         stage('Docker push') {
             agent any
             steps {
