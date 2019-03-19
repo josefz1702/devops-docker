@@ -42,10 +42,10 @@ pipeline {
                docker { image 'docker' }
             }
             steps {
-            sh "docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package"
-            sh "docker build -t ${docker_registry}:${BUILD_NUMBER} ."
-            sh "aws ecr get-login --no-include-email"
-            sh "docker push ${docker_registry}:${BUILD_NUMBER}"
+              sh 'docker run -it --rm --name devops-docker -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.3-jdk-8 mvn clean package'
+              sh 'docker build -t ${docker_registry}:${BUILD_NUMBER} .'
+              sh 'aws ecr get-login --no-include-email'
+              sh 'docker push ${docker_registry}:${BUILD_NUMBER}'
             }
         }
     }
