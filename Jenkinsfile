@@ -91,7 +91,7 @@ pipeline {
             """
 
           sh """
-            aws ecs register-task-definition  --family ${taskFamily} --cli-input-json "file:///$(pwd)/app-deployment.json"
+            aws ecs register-task-definition --family ${taskFamily} --cli-input-json app-deployment.json
             """
 
           sh """
