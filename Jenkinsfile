@@ -36,22 +36,16 @@ pipeline {
             steps {
               sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
-              sh 'docker run --network="host" --rm -d -p 8080:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
+              sh 'docker run --network="host" --rm -d -p 32000:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
               sh './tests/integration_test.sh'
             }
 
             post {
                 success {
                   echo 'Integration test run successfully !!!'
-                  sh 'docker stop app'
-                  sh 'docker rm app'
-                  sh 'docker rmi "${docker_registry}:${BUILD_NUMBER}"'
                 }
                 failure {
-                    sh 'docker stop app'
-                    sh 'docker rm build'
-                    sh 'docker rm app'
-                    sh 'docker "${docker_registry}:${BUILD_NUMBER}"'
+                  echo 'Integration test failure'
                 }
             }
         }
@@ -75,6 +69,10 @@ pipeline {
                     echo 'Error pushing to AWS ECR'
                 }
             }
+        }
+
+        stage('Deploy'){
+
         }
     }
 }
