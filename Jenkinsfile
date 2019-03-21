@@ -53,10 +53,9 @@ pipeline {
             agent any
             steps {
               script{
-                docker.build('"${docker_registry}:${BUILD_NUMBER}"')
                 docker.withRegistry('https://309160247445.dkr.ecr.us-west-2.amazonaws.com', 'ecr:us-west-2:aws') {
-                  docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('${BUILD_NUMBER}')
-                  docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('latest')
+                  dockerImage=docker.build("${docker_registry}:${BUILD_NUMBER}")
+                  dockerImage.push()
                 }
               }
             }
