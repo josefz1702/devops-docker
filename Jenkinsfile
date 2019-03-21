@@ -1,4 +1,5 @@
 pipeline {
+
     agent none
 
     environment {
@@ -57,11 +58,12 @@ pipeline {
 
         stage('Docker push') {
             agent any
-
-            docker.build('"${docker_registry}:${BUILD_NUMBER}"')
-            docker.withRegistry('https://309160247445.dkr.ecr.us-west-2.amazonaws.com', 'ecr:us-west-2:aws') {
-              docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('${BUILD_NUMBER}')
-              docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('latest')
+            steps {
+              docker.build('"${docker_registry}:${BUILD_NUMBER}"')
+              docker.withRegistry('https://309160247445.dkr.ecr.us-west-2.amazonaws.com', 'ecr:us-west-2:aws') {
+                docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('${BUILD_NUMBER}')
+                docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('latest')
+              }
             }
             post {
                 success {
