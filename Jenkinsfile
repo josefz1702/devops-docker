@@ -36,7 +36,7 @@ pipeline {
               sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
               sh 'docker run --network="host" --rm -d -p 8080:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
-              sh './test/integration_test.sh'
+              sh './tests/integration_test.sh'
             }
 
             post {
@@ -58,19 +58,16 @@ pipeline {
         stage('Docker push') {
             agent any
             steps {
-              sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package'
-              sh 'docker build -t ${docker_registry}:${BUILD_NUMBER} .'
-              sh 'aws ecr get-login --no-include-email'
-              sh 'docker push "${docker_registry}:${BUILD_NUMBER}"'
+              docker.build('"${docker_registry}:${BUILD_NUMBER}"')
+              docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('${BUILD_NUMBER}')
+              docker.image('"${docker_registry}:${BUILD_NUMBER}"').push('latest')
             }
             post {
                 success {
-                    sh 'docker rm build'
                     echo 'Docker image successfully pushed to AWS'
                 }
                 failure {
-                    sh 'docker rm build'
-                    sh 'docker rmi "${docker_registry}:${BUILD_NUMBER}"'
+                    echo 'Error pushing to AWS ECR'
                 }
             }
         }
