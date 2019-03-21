@@ -6,6 +6,9 @@ pipeline {
 	    AWS_DEFAULT_REGION = "us-west-2"
       git_repository = "https://github.com/rauccapuclla/devops-docker.git"
       docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
+      taskFamily="app-task"
+      cluster="mycluster"
+
     }
     stages {
         stage('build') {
@@ -70,6 +73,7 @@ pipeline {
         }
 
         stage('Deploy'){
+          agent any
           steps {
           withCredentials(
                 [[
@@ -90,10 +94,7 @@ pipeline {
             '''
 
           sh '''
-            aws ecs update-service  --cluster ${clusterName}                        \
-                                    --service ${serviceName}                        \
-                                    --task-definition ${taskFamily}:${taskRevision} \
-                                    --desired-count 1                               \
+            aws ecs update-service  --cluster ${clusterName} --service ${serviceName} --task-definition ${taskFamily} --desired-count 1
             '''
           }
          }
