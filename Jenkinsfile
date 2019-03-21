@@ -72,6 +72,7 @@ pipeline {
         }
 
         stage('Deploy'){
+          steps {
           withCredentials(
                 [[
                     $class: 'AmazonWebServicesCredentialsBinding',
@@ -104,6 +105,7 @@ pipeline {
                                     --desired-count 1                               \
             '''
           }
+         }
         }
     }
 }
