@@ -48,9 +48,13 @@ pipeline {
             post {
                 success {
                   echo 'Integration test run successfully !!!'
+                  sh 'docker stop app'
+                  sh 'docker rm app'
                 }
                 failure {
                   echo 'Integration test failure'
+                  sh 'docker stop app'
+                  sh 'docker rm app'
                 }
             }
         }
