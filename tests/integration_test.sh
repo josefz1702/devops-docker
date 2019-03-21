@@ -5,7 +5,7 @@ port=$2
 respuesta=$(curl -s http://$host:$port)
 
 if [ ! -z "$respuesta" ]; then
-  if [ "$respuesta" == "Aplicación de laboratorio v1" ]; then
+  if [ "$respuesta" == "Aplicación de laboratorio v2" ]; then
     echo "STATUS: Success"
     echo "Value : $respuesta"
     exit 0
