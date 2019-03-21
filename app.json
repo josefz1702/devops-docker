@@ -9,7 +9,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/app",
-          "awslogs-region": "${aws_region}",
+          "awslogs-region": "us-west-2",
           "awslogs-stream-prefix": "ecs"
         }
     },
