@@ -41,20 +41,17 @@ pipeline {
               sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
               sh 'docker run --rm -d -p 32000:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
-              sh 'curl http://54.202.122.79:32000'
-              sh './tests/integration_test.sh 54.202.122.79 32000'
+              sh 'curl http://localhost:32000'
             }
 
             post {
                 success {
                   echo 'Integration test run successfully !!!'
                   sh 'docker stop app'
-                  sh 'docker rm app'
                 }
                 failure {
                   echo 'Integration test failure'
                   sh 'docker stop app'
-                  sh 'docker rm app'
                 }
             }
         }
