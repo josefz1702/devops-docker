@@ -87,16 +87,9 @@ pipeline {
             sed -e  's;app_image;${docker_registry}:${BUILD_NUMBER};g' app.json
             '''
 
-          sh '''                                  \
+          sh '''
             aws ecs register-task-definition  --family ${taskFamily} --cli-input-json app.json
             '''
-
-          def taskRevision = sh (
-            returnStdout: true,
-            script: '''
-              aws ecs describe-task-definition  --task-definition ${taskFamily} | egrep 'revision' | tr ',' ' ' | awk '{print \$2}'
-            '''
-          ).trim()
 
           sh '''
             aws ecs update-service  --cluster ${clusterName}                        \
