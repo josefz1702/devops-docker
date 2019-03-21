@@ -83,19 +83,19 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
 
-          sh '''
+          sh """
             AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
             AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-            sed -e  's;app_image;${docker_registry}:${BUILD_NUMBER};g' app.json
-            '''
+            sed -e  "s;app_image;${docker_registry}:${BUILD_NUMBER};g" app.json
+            """
 
-          sh '''
+          sh """
             aws ecs register-task-definition  --family ${taskFamily} --cli-input-json app.json
-            '''
+            """
 
-          sh '''
+          sh """
             aws ecs update-service  --cluster ${clusterName} --service ${serviceName} --task-definition ${taskFamily} --desired-count 1
-            '''
+            """
           }
          }
         }
