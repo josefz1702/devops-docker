@@ -90,9 +90,7 @@ pipeline {
             sed -e  "s;app_image;${docker_registry}:${BUILD_NUMBER};g" app.json > app-deployment.json
             """
 
-          sh """
-            aws ecs register-task-definition --family ${taskFamily} --cli-input-json \\\"file://$(pwd)/app-deployment.json\\\"
-            """
+          sh "aws ecs register-task-definition --family ${taskFamily} --cli-input-json file://\$(pwd)/app-deployment.json"
 
           sh """
             aws ecs update-service  --cluster ${clusterName} --service ${serviceName} --task-definition ${taskFamily} --desired-count 1
