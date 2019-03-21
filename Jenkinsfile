@@ -33,9 +33,9 @@ pipeline {
             agent any
 
             steps {
-              sh 'docker run --rm --network=host --name build -v /var/jenkins_home:/var/jenkins_home maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
+              sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
-              sh 'docker run --rm -d -p 8080:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
+              sh 'docker run --network="host" --rm -d -p 8080:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
               sh 'apt-get install -y curl'
               sh 'apt-get install -y aws-cli'
               sh './test/integration_test.sh'
@@ -60,7 +60,7 @@ pipeline {
         stage('Docker push') {
             agent any
             steps {
-              sh 'docker run --rm --name build -v "$(pwd)":/usr/src/app/ -w /usr/src/app/ maven:3.3-jdk-8 mvn clean package'
+              sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t ${docker_registry}:${BUILD_NUMBER} .'
               sh 'aws ecr get-login --no-include-email'
               sh 'docker push "${docker_registry}:${BUILD_NUMBER}"'
