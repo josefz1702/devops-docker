@@ -80,7 +80,7 @@ pipeline {
                 [[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    credentialsId: 'aws',  // ID of credentials in Jenkins
+                    credentialsId: 'aws',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
 
@@ -91,11 +91,11 @@ pipeline {
             """
 
           sh """
-            aws ecs register-task-definition  --family "${taskFamily}" --cli-input-json file:///$(pwd)/app-deployment.json
+            aws ecs register-task-definition  --family ${taskFamily} --cli-input-json "file:///$(pwd)/app-deployment.json"
             """
 
           sh """
-            aws ecs update-service  --cluster \${clusterName} --service \${serviceName} --task-definition \${taskFamily} --desired-count 1
+            aws ecs update-service  --cluster ${clusterName} --service ${serviceName} --task-definition ${taskFamily} --desired-count 1
             """
           }
          }
