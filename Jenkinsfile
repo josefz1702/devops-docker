@@ -3,7 +3,7 @@ pipeline {
     agent none
 
     environment {
-	    region = "us-west-2"
+	    AWS_DEFAULT_REGION = "us-west-2"
       git_repository = "https://github.com/rauccapuclla/devops-docker.git"
       docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
     }
@@ -72,7 +72,42 @@ pipeline {
         }
 
         stage('Deploy'){
+          withCredentials(
+                [[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    credentialsId: 'aws',  // ID of credentials in Jenkins
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
 
+          sh "
+            AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            sed -e  's;app_image;${docker_registry}:${BUILD_NUMBER};g' app.json
+            "
+
+          sh  "                                                                     \
+            aws ecs register-task-definition  --family ${taskFamily}                \
+                                              --cli-input-json app.json        \
+          "
+
+          def taskRevision = sh (
+            returnStdout: true,
+            script:  "                                                              \
+              aws ecs describe-task-definition  --task-definition ${taskFamily}     \
+                                                | egrep 'revision'                  \
+                                                | tr ',' ' '                        \
+                                                | awk '{print \$2}'                 \
+            "
+          ).trim()
+
+          sh  "                                                                     \
+            aws ecs update-service  --cluster ${clusterName}                        \
+                                    --service ${serviceName}                        \
+                                    --task-definition ${taskFamily}:${taskRevision} \
+                                    --desired-count 1                               \
+          "
+        }
         }
     }
 }

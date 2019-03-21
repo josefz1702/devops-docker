@@ -1,9 +1,9 @@
 [
   {
     "name": "app",
-    "image": "${app_image}",
-    "cpu": ${fargate_cpu},
-    "memory": ${fargate_memory},
+    "image": "app_image",
+    "cpu": 256,
+    "memory": 512,
     "networkMode": "awsvpc",
     "logConfiguration": {
         "logDriver": "awslogs",
@@ -15,8 +15,8 @@
     },
     "portMappings": [
       {
-        "containerPort": ${app_port},
-        "hostPort": ${app_port}
+        "containerPort": 8080,
+        "hostPort": 8080
       }
     ]
   }
