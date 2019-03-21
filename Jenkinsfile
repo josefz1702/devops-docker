@@ -37,7 +37,6 @@ pipeline {
               sh 'docker run --rm --name build -w /var/jenkins_home/workspace/devops-docker --volumes-from jenkins maven:3.3-jdk-8 mvn clean package'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
               sh 'docker run --network="host" --rm -d -p 32000:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
-              sh './tests/integration_test.sh'
             }
 
             post {
