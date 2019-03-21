@@ -5,7 +5,7 @@
     "containerDefinitions": [
         {
             "name": "app",
-            "image": "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker:36",
+            "image": "app_image",
             "portMappings": [
                 {
                     "containerPort": 8080,
