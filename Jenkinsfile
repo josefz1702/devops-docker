@@ -6,8 +6,9 @@ pipeline {
 	    AWS_DEFAULT_REGION = "us-west-2"
       git_repository = "https://github.com/rauccapuclla/devops-docker.git"
       docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
-      taskFamily="app-task"
       cluster="mycluster"
+      service="app-service"
+      taskFamily="app-task"
 
     }
     stages {
@@ -90,7 +91,6 @@ pipeline {
             """
 
           sh """
-            ls -la
             aws ecs register-task-definition  --family ${taskFamily} --cli-input-json app-deployment.json
             """
 

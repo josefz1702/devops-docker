@@ -1,23 +1,32 @@
-[
-  {
-    "name": "app",
-    "image": "app_image",
-    "cpu": 256,
-    "memory": 512,
+{
+    "family": "app-task",
+    "executionRoleArn": "arn:aws:iam::309160247445:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/app",
-          "awslogs-region": "us-west-2",
-          "awslogs-stream-prefix": "ecs"
+    "containerDefinitions": [
+        {
+            "name": "app",
+            "image": "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker:36",
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                  "awslogs-group": "/ecs/app",
+                  "awslogs-region": "us-west-2",
+                  "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "essential": true
         }
-    },
-    "portMappings": [
-      {
-        "containerPort": 8080,
-        "hostPort": 8080
-      }
-    ]
-  }
-]
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512"
+}
