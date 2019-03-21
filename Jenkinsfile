@@ -80,34 +80,30 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
 
-          sh "
+          sh '''
             AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
             AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
             sed -e  's;app_image;${docker_registry}:${BUILD_NUMBER};g' app.json
-            "
+            '''
 
-          sh  "                                                                     \
-            aws ecs register-task-definition  --family ${taskFamily}                \
-                                              --cli-input-json app.json        \
-          "
+          sh '''                                  \
+            aws ecs register-task-definition  --family ${taskFamily} --cli-input-json app.json
+            '''
 
           def taskRevision = sh (
             returnStdout: true,
-            script:  "                                                              \
-              aws ecs describe-task-definition  --task-definition ${taskFamily}     \
-                                                | egrep 'revision'                  \
-                                                | tr ',' ' '                        \
-                                                | awk '{print \$2}'                 \
-            "
+            script: '''
+              aws ecs describe-task-definition  --task-definition ${taskFamily} | egrep 'revision' | tr ',' ' ' | awk '{print \$2}'
+            '''
           ).trim()
 
-          sh  "                                                                     \
+          sh '''
             aws ecs update-service  --cluster ${clusterName}                        \
                                     --service ${serviceName}                        \
                                     --task-definition ${taskFamily}:${taskRevision} \
                                     --desired-count 1                               \
-          "
-        }
+            '''
+          }
         }
     }
 }
