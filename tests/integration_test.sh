@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+host=$1
+port=$2
 
-respuesta=$(curl -s http://localhost:32000)
+respuesta=$(curl -s http://$host:$port)
 
 if [ ! -z "$respuesta" ]; then
   if [ "$respuesta" == "Aplicación de laboratorio v1" ]; then
