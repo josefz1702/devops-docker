@@ -59,8 +59,8 @@ pipeline {
               docker run --rm --name build -w /var/jenkins_home/jobs/spring-boot-pipeline/workspace --volumes-from jenkins maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true
               docker build -t "${docker_registry}:${BUILD_NUMBER}" .
               docker run --rm -d --name app "${docker_registry}:${BUILD_NUMBER}"
-              docker inspect -f '{{ .NetworkSettings.IPAddress }}' app", returnStdout: true)
-              sed -e  "s;localhost;${ip};g" tests/test_collection.json > test.json
+              IP = \$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' app)
+              sed -e "s;localhost;${ip};g" tests/test_collection.json > test.json
               newman run test.json
               newman run --reporters junit,cli,json,xml test.json
               '''
