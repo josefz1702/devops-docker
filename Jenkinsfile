@@ -4,7 +4,6 @@ pipeline {
 
     environment {
 	    AWS_DEFAULT_REGION = "us-west-2"
-      git_repository = "https://github.com/rauccapuclla/devops-docker.git"
       docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
       sonarhost = credentials('sonarhost')
       sonarkey = credentials('sonar')
@@ -14,14 +13,15 @@ pipeline {
       taskFamily="app-task"
 
     }
+    def ip = ""
     stages {
-        stage('build') {
+        stage('Pull and verify') {
             agent {
                docker { image 'maven:3-alpine' }
             }
             steps {
-              git url: "${git_repository}", branch: 'develop'
-              sh "mvn clean install -Dmaven.test.skip=true"
+              git url: "${docker_registry}", branch: 'develop'
+              sh "mvn clean verify -Dmaven.test.skip=true"
             }
         }
         stage('Test') {
@@ -46,7 +46,7 @@ pipeline {
             }
             post {
             success {
-              junit 'target/surefire-reports/**/*.xml'
+              echo 'Sonarqube analisys done'
               }
            }
         }
@@ -56,13 +56,18 @@ pipeline {
             steps {
               sh 'docker run --rm --name build -w /var/jenkins_home/jobs/spring-boot-pipeline/workspace --volumes-from jenkins maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
-              sh 'docker run --rm -d -p 32000:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
+              sh 'docker run --rm -d --name app "${docker_registry}:${BUILD_NUMBER}"'
+              ip = sh(script: 'docker inspect -f '{{ .NetworkSettings.IPAddress }}' app', returnStdout: true)
+              sh 'sed -e  "s;localhost;${ip};g" tests/test_collection.json > test.json'
+              sh 'newman run test.json'
+              sh 'newman run --reporters junit,cli,json,xml test.json'
             }
 
             post {
                 success {
                   echo 'Integration test run successfully !!!'
                   sh 'docker stop app'
+                  junit '**/*.xml'
                 }
                 failure {
                   echo 'Integration test failure'
