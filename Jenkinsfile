@@ -4,6 +4,7 @@ pipeline {
 
     environment {
 	    AWS_DEFAULT_REGION = "us-west-2"
+      repository = "https://github.com/rauccapuclla/devops-docker.git"
       docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
       sonarhost = credentials('sonarhost')
       sonarkey = credentials('sonar')
@@ -20,7 +21,7 @@ pipeline {
                docker { image 'maven:3-alpine' }
             }
             steps {
-              git url: "${docker_registry}", branch: 'develop'
+              git url: "${repository}", branch: 'develop'
               sh "mvn clean verify -Dmaven.test.skip=true"
             }
         }
