@@ -54,7 +54,7 @@ pipeline {
             agent any
 
             steps {
-              sh 'docker run --rm --name build -w /var/jenkins_home/workspace/spring-boot-pipeline --volumes-from jenkins maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
+              sh 'docker run --rm --name build -w /var/jenkins_home/jobs/spring-boot-pipeline/workspace --volumes-from jenkins maven:3.3-jdk-8 mvn clean package -Dmaven.test.skip=true'
               sh 'docker build -t "${docker_registry}:${BUILD_NUMBER}" .'
               sh 'docker run --rm -d -p 32000:8080 --name app "${docker_registry}:${BUILD_NUMBER}"'
             }
