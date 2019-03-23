@@ -75,7 +75,7 @@ pipeline {
             agent any
             steps {
               script{
-                docker.withRegistry('https://309160247445.dkr.ecr.us-west-2.amazonaws.com', 'aws') {
+                docker.withRegistry('https://309160247445.dkr.ecr.us-west-2.amazonaws.com', 'ecr:us-west-2:aws') {
                   dockerImage=docker.build("${docker_registry}:${BUILD_NUMBER}")
                   dockerImage.push()
                 }
