@@ -1,7 +1,7 @@
 version: '2'
 services:
   maven:
-    image: maven:alpine
+    image: 3.6.0-jdk-8-alpine
     volumes:
       - .:/usr/src/app
       - mavenrepo:/root/.m2
