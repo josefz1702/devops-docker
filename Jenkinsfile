@@ -6,6 +6,9 @@ pipeline {
 	    AWS_DEFAULT_REGION = "us-west-2"
       git_repository = "https://github.com/rauccapuclla/devops-docker.git"
       docker_registry = "309160247445.dkr.ecr.us-west-2.amazonaws.com/devops-docker"
+      sonarhost = credentials('sonarhost')
+      sonarkey = credentials('sonar')
+      
       cluster="mycluster"
       service="app-service"
       taskFamily="app-task"
@@ -27,6 +30,20 @@ pipeline {
             }
             steps {
             sh 'mvn clean test'
+            }
+            post {
+            success {
+              junit 'target/surefire-reports/**/*.xml'
+              }
+           }
+        }
+        stage('Sonarqube Analysis') {
+            agent {
+               docker { image 'maven:3-alpine' }
+            }
+            steps {
+              withCredentials(
+            sh 'mvn sonar:sonar -Dsonar.host.url="${sonarhost}" -Dsonar.login="${sonarkey}"'
             }
             post {
             success {
