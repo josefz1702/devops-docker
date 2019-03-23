@@ -43,7 +43,7 @@ pipeline {
             }
             steps {
               withCredentials(
-            sh 'mvn sonar:sonar -Dsonar.host.url="${sonarhost}" -Dsonar.login="${sonarkey}"'
+            sh "mvn sonar:sonar -Dsonar.host.url=${sonarhost} -Dsonar.login=${sonarkey}"
             }
             post {
             success {
