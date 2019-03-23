@@ -61,7 +61,7 @@ pipeline {
               docker run --rm -d --name app "${docker_registry}:${BUILD_NUMBER}"
               IP=\$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' app)
               sed -e "s;localhost;\$IP;g" tests/test_collection.json > test.json
-              sleep 10s
+              sleep 30s
               newman run test.json
               newman run --reporters junit,cli,json,xml test.json
               '''
