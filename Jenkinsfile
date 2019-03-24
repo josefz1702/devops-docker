@@ -131,9 +131,6 @@ pipeline {
                 success {
                     slackSend (color: '#00FF00', message: "Deployment of ${docker_registry}:${BUILD_NUMBER} started")
                 }
-                failure {
-                    slackSend (color: 'red', message: "Deployment of ${docker_registry}:${BUILD_NUMBER} failed")
-                }
             }
         }
     }
