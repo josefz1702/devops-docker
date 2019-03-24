@@ -1,3 +1,5 @@
+@Library('shared-library')_
+
 pipeline {
 
     agent none
@@ -16,13 +18,14 @@ pipeline {
     }
     
     stages {
-        stage('Pull and verify') {
+        stage('Build') {
             agent {
                docker { image 'maven:3-alpine' }
             }
             steps {
               git url: "${repository}", branch: 'develop'
               sh "mvn clean verify -Dmaven.test.skip=true"
+              slackSend (color: '#00FF00', message: "Build Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}) started")
             }
         }
         stage('Test') {
@@ -120,10 +123,24 @@ pipeline {
           sh "aws ecs register-task-definition --family ${taskFamily} --cli-input-json file://\$(pwd)/app-deployment.json"
 
           sh """
-            aws ecs update-service  --cluster ${cluster} --service ${service} --task-definition ${taskFamily} --desired-count 1
-            """
+             aws ecs update-service  --cluster ${cluster} --service ${service} --task-definition ${taskFamily} --desired-count 1
+             """
           }
          }
+            post {
+                success {
+                    slackSend (color: '#00FF00', message: "Deployment of ${docker_registry}:${BUILD_NUMBER} started")
+                }
+                failure {
+                    slackSend (color: 'red', message: "Deployment of ${docker_registry}:${BUILD_NUMBER} failed")
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            slackMessage(currentBuild.currentResult)
         }
     }
 }
