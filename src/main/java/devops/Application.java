@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
             Arrays.sort(beanNames);
             for (String beanName : beanNames) {
                 System.out.println(beanName);
+                System.out.println("prueba");
             }
         };
     }
