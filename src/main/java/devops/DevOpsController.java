@@ -13,9 +13,8 @@ public class DevOpsController {
       LOGGER.debug("DEBUG message");
       LOGGER.warn("WARN message");
       LOGGER.error("ERROR message");
-
-      return "Aplicación de laboratorio v4";
       
+      return "Aplicación de laboratorio v4";
       
     }
 }
